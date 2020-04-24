@@ -43,3 +43,26 @@ rotacion = 1 #Hermite clásico = 0, Hermite rotado = 1
 u, v = of_warp_multi(img1, img2, alpha, gamma, num_levels, itera_outer, itera_iner, rotacion)
 ```
 
+Las variables **u** y **v** son la velocidades del flujo óptico.
+
+## Flujo paralelizado
+
+Con el objetivo de acelerar el cálculo del flujo óptico contemplando que se analizarán secuencias de imágenes con diferente número de frames, se plantea paralelizar el proceso agregando la librería **joblib**:
+
+```python
+from joblib import Parallel, delayed
+```
+
+Las funciones **Parallel** y **delayed** de **joblib** son aplicadas sobre la función **of_warp_multi** de la siguiente manera:
+
+```python
+results = Parallel(n_jobs=mp.cpu_count(), prefer='threads')(delayed(of_warp_multi_mod)(volumen[idv-volumen.shape[0],:,:], volumen[idv+1-volumen.shape[0],:,:], alpha, gamma, num_levels, itera_oter[0], itera_iner[0], rotacion,sg[0]) for idv in range(volumen.shape[0]))
+```
+
+Esta implementación está en el código **prueba_paralelizacion.py** en dónde se calcula el flujo óptico de una secuencia de ultrasonido cardiaco.
+
+Por último, el código **FlujoOptico_CAMUS_paralelo.py** sirve para calcular los flujos de las secuencias de la base de datos pública CAMUS.
+
+    
+
+
